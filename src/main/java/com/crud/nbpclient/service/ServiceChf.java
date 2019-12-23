@@ -15,9 +15,11 @@ public class ServiceChf {
     public List<Chf> getAllChf() {
         return repositoryChf.findAll();
     }
+
     public Chf saveChf(final Chf chf) {
         return repositoryChf.save(chf);
     }
+
     public void deleteAllChf() {
         repositoryChf.deleteAll();
     }
