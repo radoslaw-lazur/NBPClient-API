@@ -12,4 +12,6 @@ public interface RepositoryChf extends CrudRepository<Chf, Long> {
     Chf save(Chf chf);
     @Override
     void deleteAll();
+    @Override
+    long count();
 }
