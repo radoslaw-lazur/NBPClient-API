@@ -10,6 +10,8 @@ import com.crud.nbpclient.repository.RepositoryChf;
 import com.crud.nbpclient.repository.RepositoryEur;
 import com.crud.nbpclient.repository.RepositoryGbp;
 import com.crud.nbpclient.service.mail.SimpleMailService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Component
+@Setter
+@Getter
 public class MailScheduler {
     @Autowired
     private SimpleMailService simpleMailService;
@@ -31,9 +35,10 @@ public class MailScheduler {
     @Autowired
     private ControllerNbp controllerNbp;
 
+    private String mailCc = null;
     private static final String SUBJECT_ALL = "Rates: ** CHF ** EUR ** GBP ** " + LocalDate.now();
 
-    @Scheduled(fixedDelay = 1000)
+    //@Scheduled(fixedDelay = 1000)
     public void sendScheduledMail() {
         long sizeChf = repositoryChf.count();
         long sizeEur = repositoryEur.count();
@@ -41,7 +46,7 @@ public class MailScheduler {
 
         simpleMailService.send(new Mail(
                         adminConfig.getAdminMail(),
-                        null,
+                        mailCc,
                         SUBJECT_ALL,
                         "CHF records: " + sizeChf + "\n" + printRatesChf() + "\n" + "EUR records: " + sizeEur
                                 + "\n" + printRatesEur() + "\n" + "GBP records: " + sizeGbp + "\n" + printRatesGbp()
