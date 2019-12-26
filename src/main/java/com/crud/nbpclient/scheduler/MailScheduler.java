@@ -12,15 +12,18 @@ import com.crud.nbpclient.repository.RepositoryGbp;
 import com.crud.nbpclient.service.mail.SimpleMailService;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Component
 @Setter
 @Getter
+@Slf4j
 public class MailScheduler {
     @Autowired
     private SimpleMailService simpleMailService;
@@ -36,9 +39,10 @@ public class MailScheduler {
     private ControllerNbp controllerNbp;
 
     private String mailCc = null;
-    private static final String SUBJECT_ALL = "Rates: ** CHF ** EUR ** GBP ** " + LocalDate.now();
+    private static final String SUBJECT_ALL = "Rates: ** CHF ** EUR ** GBP ** "
+            + LocalDate.now(ZoneId.of("Europe/Paris"));
 
-    //@Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 4000)
     public void sendScheduledMail() {
         long sizeChf = repositoryChf.count();
         long sizeEur = repositoryEur.count();
@@ -56,6 +60,7 @@ public class MailScheduler {
             repositoryChf.deleteAll();
             repositoryEur.deleteAll();
             repositoryGbp.deleteAll();
+            log.info("Repositories cleaned up");
         }
     }
 
