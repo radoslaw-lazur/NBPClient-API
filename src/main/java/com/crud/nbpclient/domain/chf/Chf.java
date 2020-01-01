@@ -23,3 +23,5 @@ public class Chf {
     @Column(name = "PLNvalue")
     private double midPLN;
 }
+
+

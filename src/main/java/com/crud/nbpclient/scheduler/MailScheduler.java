@@ -37,60 +37,64 @@ public class MailScheduler {
     private AdminConfig adminConfig;
     @Autowired
     private ControllerNbp controllerNbp;
-
     private String mailCc = null;
     private static final String SUBJECT_ALL = "Rates: ** CHF ** EUR ** GBP ** "
-            + LocalDate.now(ZoneId.of("Europe/Paris"));
+            + LocalDate.now(ZoneId.of("Europe/Warsaw"));
 
-    @Scheduled(fixedDelay = 4000)
+    //@Scheduled(fixedDelay = 3000)
     public void sendScheduledMail() {
         long sizeChf = repositoryChf.count();
         long sizeEur = repositoryEur.count();
         long sizeGbp = repositoryGbp.count();
 
         simpleMailService.send(new Mail(
-                        adminConfig.getAdminMail(),
-                        mailCc,
-                        SUBJECT_ALL,
-                        "CHF records: " + sizeChf + "\n" + printRatesChf() + "\n" + "EUR records: " + sizeEur
-                                + "\n" + printRatesEur() + "\n" + "GBP records: " + sizeGbp + "\n" + printRatesGbp()
+                adminConfig.getAdminMail(),
+                mailCc,
+                SUBJECT_ALL,
+                "CHF records: " + sizeChf + "\n" + printRatesChf() + "\n" + "EUR records: " + sizeEur
+                        + "\n" + printRatesEur() + "\n" + "GBP records: " + sizeGbp + "\n" + printRatesGbp()
         ));
 
-        if (sizeChf == 31 || sizeEur == 31 || sizeGbp == 31) {
+        if (sizeChf == 30 || sizeEur == 30 || sizeGbp == 30) {
             repositoryChf.deleteAll();
             repositoryEur.deleteAll();
             repositoryGbp.deleteAll();
+            controllerNbp.saveCHF();
+            controllerNbp.saveEUR();
+            controllerNbp.saveGBP();
+            simpleMailService.send(new Mail(adminConfig.getAdminMail(), mailCc,SUBJECT_ALL,
+                    "The databases are cleaned when they reach 30 records"));
             log.info("Repositories cleaned up");
         }
     }
 
     private String printRatesChf() {
-        controllerNbp.saveCHF();
         StringBuilder chfRates = new StringBuilder();
         for (Chf chf : repositoryChf.findAll()) {
             chfRates.append(chf.getName()).append(" * ").append(chf.getDate()).append(" * ").append(chf.getMidPLN())
                     .append(" PLN").append("\n");
         }
+        controllerNbp.saveCHF();
         return chfRates.toString();
     }
 
     private String printRatesEur() {
-        controllerNbp.saveEUR();
         StringBuilder eurRates = new StringBuilder();
         for (Eur eur : repositoryEur.findAll()) {
             eurRates.append(eur.getName()).append(" * ").append(eur.getDate()).append(" * ").append(eur.getMidPLN())
                     .append(" PLN").append("\n");
         }
+        controllerNbp.saveEUR();
         return eurRates.toString();
     }
 
     private String printRatesGbp() {
-        controllerNbp.saveGBP();
         StringBuilder gbpRates = new StringBuilder();
         for (Gbp gbp : repositoryGbp.findAll()) {
             gbpRates.append(gbp.getName()).append(" * ").append(gbp.getDate()).append(" * ").append(gbp.getMidPLN())
                     .append(" PLN").append("\n");
         }
+        controllerNbp.saveGBP();
         return gbpRates.toString();
     }
 }
