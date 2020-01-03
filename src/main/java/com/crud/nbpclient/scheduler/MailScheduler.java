@@ -60,7 +60,7 @@ public class MailScheduler {
             controllerNbp.saveCHF();
             controllerNbp.saveEUR();
             controllerNbp.saveGBP();
-            simpleMailService.send(new Mail(adminConfig.getAdminMail(), mailCc,SUBJECT_ALL,
+            simpleMailService.send(new Mail(adminConfig.getAdminMail(), mailCc, SUBJECT_ALL,
                     "The databases are cleaned when they reach 30 records"));
             log.info("Repositories cleaned up");
         }
